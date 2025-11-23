@@ -227,89 +227,90 @@ const menu = [
   { name: "Sea Bass Fillet", price: 600.55 }
 ];
 
-const ordersContainer = document.getElementById("ordersContainer");
-const grandTotalSpan = document.getElementById("grandTotal");
+document.addEventListener("DOMContentLoaded", () => {
+  const ordersContainer = document.getElementById("ordersContainer");
+  const grandTotalSpan = document.getElementById("grandTotal");
+  const addOrderBtn = document.getElementById("addOrderBtn");
 
-document.getElementById("addOrderBtn").addEventListener("click", addOrder);
+  addOrderBtn.addEventListener("click", addOrder);
 
-function addOrder() {
-  const orderBox = document.createElement("div");
-  orderBox.className = "order-box";
+  function addOrder() {
+    const orderBox = document.createElement("div");
+    orderBox.className = "order-box";
 
-  const nameInput = document.createElement("input");
-  nameInput.placeholder = "Name";
-  orderBox.appendChild(nameInput);
-  orderBox.appendChild(document.createElement("br"));
+    const nameInput = document.createElement("input");
+    nameInput.placeholder = "Name";
+    orderBox.appendChild(nameInput);
+    orderBox.appendChild(document.createElement("br"));
 
-  // Add first item row by default
-  addItemRow(orderBox, 1);
+    addItemRow(orderBox, 1);
 
-  const addItemBtn = document.createElement("button");
-  addItemBtn.textContent = "Add Item";
-  addItemBtn.addEventListener("click", () => {
-    const nextIndex = orderBox.querySelectorAll(".item-row").length + 1;
-    addItemRow(orderBox, nextIndex);
-  });
+    const addItemBtn = document.createElement("button");
+    addItemBtn.textContent = "Add Item";
+    addItemBtn.addEventListener("click", () => {
+      const nextIndex = orderBox.querySelectorAll(".item-row").length + 1;
+      addItemRow(orderBox, nextIndex);
+    });
 
-  orderBox.appendChild(addItemBtn);
-  orderBox.appendChild(document.createElement("br"));
+    orderBox.appendChild(addItemBtn);
+    orderBox.appendChild(document.createElement("br"));
 
-  const totalSpan = document.createElement("span");
-  totalSpan.textContent = "Total: 0.00 EGP";
-  orderBox.appendChild(totalSpan);
+    const totalSpan = document.createElement("span");
+    totalSpan.textContent = "Total: 0.00 EGP";
+    orderBox.appendChild(totalSpan);
 
-  ordersContainer.appendChild(orderBox);
+    ordersContainer.appendChild(orderBox);
 
-  // Update totals on any input change
-  orderBox.addEventListener("input", () => updateOrderTotal(orderBox, totalSpan));
-}
+    orderBox.addEventListener("input", () => updateOrderTotal(orderBox, totalSpan));
+  }
 
-function addItemRow(container, index) {
-  const div = document.createElement("div");
-  div.className = "item-row";
+  function addItemRow(container, index) {
+    const div = document.createElement("div");
+    div.className = "item-row";
 
-  const select = document.createElement("select");
-  menu.forEach(item => {
-    const option = document.createElement("option");
-    option.value = item.name;
-    option.textContent = `${item.name} - ${item.price} EGP`;
-    select.appendChild(option);
-  });
+    const select = document.createElement("select");
+    menu.forEach(item => {
+      const option = document.createElement("option");
+      option.value = item.name;
+      option.textContent = `${item.name} - ${item.price} EGP`;
+      select.appendChild(option);
+    });
 
-  const qty = document.createElement("input");
-  qty.type = "number";
-  qty.value = 1;
-  qty.min = 1;
-  qty.style.width = "50px";
+    const qty = document.createElement("input");
+    qty.type = "number";
+    qty.value = 1;
+    qty.min = 1;
+    qty.style.width = "50px";
 
-  div.appendChild(document.createTextNode(`Item ${index}: `));
-  div.appendChild(select);
-  div.appendChild(document.createTextNode(" Qty: "));
-  div.appendChild(qty);
+    div.appendChild(document.createTextNode(`Item ${index}: `));
+    div.appendChild(select);
+    div.appendChild(document.createTextNode(" Qty: "));
+    div.appendChild(qty);
 
-  container.appendChild(div);
-}
+    container.appendChild(div);
+  }
 
-function updateOrderTotal(orderBox, totalSpan) {
-  const rows = orderBox.querySelectorAll(".item-row");
-  let total = 0;
-  rows.forEach(row => {
-    const select = row.querySelector("select");
-    const qty = parseInt(row.querySelector("input").value) || 1;
-    const item = menu.find(i => i.name === select.value);
-    if (item) total += item.price * qty;
-  });
-  total *= 1.28; // apply tax/service
-  totalSpan.textContent = `Total: ${total.toFixed(2)} EGP`;
-  updateGrandTotal();
-}
+  function updateOrderTotal(orderBox, totalSpan) {
+    const rows = orderBox.querySelectorAll(".item-row");
+    let total = 0;
+    rows.forEach(row => {
+      const select = row.querySelector("select");
+      const qty = parseInt(row.querySelector("input").value) || 1;
+      const item = menu.find(i => i.name === select.value);
+      if (item) total += item.price * qty;
+    });
+    total *= 1.28; // tax + service
+    totalSpan.textContent = `Total: ${total.toFixed(2)} EGP`;
+    updateGrandTotal();
+  }
 
-function updateGrandTotal() {
-  let grandTotal = 0;
-  document.querySelectorAll(".order-box span").forEach(span => {
-    const text = span.textContent.replace("Total: ", "").replace(" EGP", "");
-    const val = parseFloat(text) || 0;
-    grandTotal += val;
-  });
-  grandTotalSpan.textContent = grandTotal.toFixed(2);
-}
+  function updateGrandTotal() {
+    let grandTotal = 0;
+    document.querySelectorAll(".order-box span").forEach(span => {
+      const text = span.textContent.replace("Total: ", "").replace(" EGP", "");
+      const val = parseFloat(text) || 0;
+      grandTotal += val;
+    });
+    grandTotalSpan.textContent = grandTotal.toFixed(2);
+  }
+});
