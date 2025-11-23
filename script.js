@@ -205,32 +205,18 @@ const menu = [
 
 let orders = [];
 
-const categorySelect = document.getElementById('categorySelect');
 const itemSelect = document.getElementById('itemSelect');
 const quantityInput = document.getElementById('quantity');
 const personNameInput = document.getElementById('personName');
 const orderSection = document.getElementById('orderSection');
 
-// Populate categories
-const categories = [...new Set(menu.map(i => i.category))];
-categories.forEach(cat => {
+// Populate items dropdown
+menu.forEach(item => {
+  const taxedPrice = (item.price * TAX_SERVICE).toFixed(2);
   const option = document.createElement('option');
-  option.value = cat;
-  option.text = cat;
-  categorySelect.appendChild(option);
-});
-
-// Update items dropdown based on category
-categorySelect.addEventListener('change', () => {
-  const category = categorySelect.value;
-  itemSelect.innerHTML = '<option value="">Select Item</option>';
-  menu.filter(i => i.category === category).forEach(item => {
-    const taxedPrice = (item.price * TAX_SERVICE).toFixed(2);
-    const option = document.createElement('option');
-    option.value = item.name;
-    option.text = `${item.name} - ${item.price.toFixed(2)} EGP (${taxedPrice} incl.)`;
-    itemSelect.appendChild(option);
-  });
+  option.value = item.name;
+  option.text = `${item.name} - ${item.price.toFixed(2)} EGP (${taxedPrice} incl.)`;
+  itemSelect.appendChild(option);
 });
 
 // Add order
@@ -245,7 +231,6 @@ function addOrder() {
 
   const item = menu.find(i => i.name === itemName);
 
-  // Check if person already exists
   let personOrder = orders.find(o => o.personName === name);
   if (!personOrder) {
     personOrder = { personName: name, items: [] };
@@ -253,7 +238,6 @@ function addOrder() {
   }
 
   personOrder.items.push({ name: item.name, price: item.price, quantity });
-  
   renderOrders();
 }
 
@@ -267,7 +251,7 @@ function renderOrders() {
     div.className = 'person';
     div.innerHTML = `<h3>${order.personName}</h3><ul>` +
       order.items.map((i) => {
-        const taxed = (i.price * TAX_SERVICE * i.quantity).toFixed(2);
+        const taxed = (i.price * i.quantity * TAX_SERVICE).toFixed(2);
         return `<li>${i.name} x ${i.quantity} x 1.28 = ${taxed} EGP
         <button class="removeItem" onclick="removeItem('${order.personName}', '${i.name}')">X</button></li>`;
       }).join('') +
