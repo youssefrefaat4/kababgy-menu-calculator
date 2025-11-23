@@ -227,112 +227,89 @@ const menu = [
   { name: "Sea Bass Fillet", price: 600.55 }
 ];
 
-let orders = []; // empty at start
+const ordersContainer = document.getElementById("ordersContainer");
+const grandTotalSpan = document.getElementById("grandTotal");
 
-// Render orders table
-function renderOrders() {
-  const tbody = document.querySelector('#orders-table tbody');
-  tbody.innerHTML = '';
+document.getElementById("addOrderBtn").addEventListener("click", addOrder);
 
-  orders.forEach((order, index) => {
-    const row = document.createElement('tr');
+function addOrder() {
+  const orderBox = document.createElement("div");
+  orderBox.className = "order-box";
 
-    // Name
-    const nameCell = document.createElement('td');
-    nameCell.textContent = order.name;
-    row.appendChild(nameCell);
+  const nameInput = document.createElement("input");
+  nameInput.placeholder = "Name";
+  orderBox.appendChild(nameInput);
+  orderBox.appendChild(document.createElement("br"));
 
-    // Item dropdown
-    const itemCell = document.createElement('td');
-    const select = document.createElement('select');
-    menu.forEach(m => {
-      const option = document.createElement('option');
-      option.value = m.name;
-      option.textContent = `${m.name} (${m.price} EGP)`;
-      if (m.name === order.item) option.selected = true;
-      select.appendChild(option);
-    });
-    select.onchange = () => {
-      const selectedItem = menu.find(m => m.name === select.value);
-      order.item = selectedItem.name;
-      order.price = selectedItem.price;
-      updateRow(row, order);
-    };
-    itemCell.appendChild(select);
-    row.appendChild(itemCell);
+  // Add first item row by default
+  addItemRow(orderBox, 1);
 
-    // Quantity
-    const quantityCell = document.createElement('td');
-    const qtyInput = document.createElement('input');
-    qtyInput.type = 'number';
-    qtyInput.min = 1;
-    qtyInput.value = order.quantity;
-    qtyInput.oninput = () => {
-      order.quantity = parseInt(qtyInput.value);
-      updateRow(row, order);
-    };
-    quantityCell.appendChild(qtyInput);
-    row.appendChild(quantityCell);
-
-    // Price per item
-    const priceCell = document.createElement('td');
-    priceCell.textContent = order.price.toFixed(2);
-    row.appendChild(priceCell);
-
-    // Total with tax
-    const totalCell = document.createElement('td');
-    totalCell.textContent = (order.price * order.quantity * 1.28).toFixed(2);
-    row.appendChild(totalCell);
-
-    // Delete button
-    const actionCell = document.createElement('td');
-    const delBtn = document.createElement('button');
-    delBtn.textContent = 'Delete';
-    delBtn.onclick = () => {
-      orders.splice(index, 1);
-      renderOrders();
-    };
-    actionCell.appendChild(delBtn);
-    row.appendChild(actionCell);
-
-    tbody.appendChild(row);
-  });
-}
-
-// Update row totals
-function updateRow(row, order) {
-  row.cells[3].textContent = order.price.toFixed(2);
-  row.cells[4].textContent = (order.price * order.quantity * 1.28).toFixed(2);
-}
-
-// Add a new member with one default item
-function addMember() {
-  const nameInput = document.getElementById('member-name');
-  const name = nameInput.value.trim();
-  if (!name) return alert('Enter a name!');
-
-  orders.push({
-    name: name,
-    item: menu[0].name,
-    quantity: 1,
-    price: menu[0].price
+  const addItemBtn = document.createElement("button");
+  addItemBtn.textContent = "Add Item";
+  addItemBtn.addEventListener("click", () => {
+    const nextIndex = orderBox.querySelectorAll(".item-row").length + 1;
+    addItemRow(orderBox, nextIndex);
   });
 
-  nameInput.value = '';
-  renderOrders();
+  orderBox.appendChild(addItemBtn);
+  orderBox.appendChild(document.createElement("br"));
+
+  const totalSpan = document.createElement("span");
+  totalSpan.textContent = "Total: 0.00 EGP";
+  orderBox.appendChild(totalSpan);
+
+  ordersContainer.appendChild(orderBox);
+
+  // Update totals on any input change
+  orderBox.addEventListener("input", () => updateOrderTotal(orderBox, totalSpan));
 }
 
-// Download CSV
-function downloadCSV() {
-  let csv = 'Name,Item,Quantity,Price(EGP)\n';
-  orders.forEach(o => {
-    csv += `${o.name},${o.item},${o.quantity},${o.price}\n`;
+function addItemRow(container, index) {
+  const div = document.createElement("div");
+  div.className = "item-row";
+
+  const select = document.createElement("select");
+  menu.forEach(item => {
+    const option = document.createElement("option");
+    option.value = item.name;
+    option.textContent = `${item.name} - ${item.price} EGP`;
+    select.appendChild(option);
   });
 
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'orders.csv';
-  a.click();
+  const qty = document.createElement("input");
+  qty.type = "number";
+  qty.value = 1;
+  qty.min = 1;
+  qty.style.width = "50px";
+
+  div.appendChild(document.createTextNode(`Item ${index}: `));
+  div.appendChild(select);
+  div.appendChild(document.createTextNode(" Qty: "));
+  div.appendChild(qty);
+
+  container.appendChild(div);
+}
+
+function updateOrderTotal(orderBox, totalSpan) {
+  const rows = orderBox.querySelectorAll(".item-row");
+  let total = 0;
+  rows.forEach(row => {
+    const select = row.querySelector("select");
+    const qty = parseInt(row.querySelector("input").value) || 1;
+    const item = menu.find(i => i.name === select.value);
+    if (item) total += item.price * qty;
+  });
+  total *= 1.28; // apply tax/service
+  totalSpan.textContent = `Total: ${total.toFixed(2)} EGP`;
+  updateGrandTotal();
+}
+
+function updateGrandTotal() {
+  let grandTotal = 0;
+  document.querySelectorAll(".order-box span").forEach(span => {
+    const text = span.textContent.replace("Total: ", "").replace(" EGP", "");
+    const val = parseFloat(text) || 0;
+    grandTotal += val;
+  });
+  grandTotalSpan.textContent = grandTotal.toFixed(2);
 }
