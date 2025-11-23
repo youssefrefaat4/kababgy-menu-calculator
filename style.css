@@ -1,6 +1,9 @@
-body { font-family: Arial, sans-serif; padding: 20px; }
-div.person { border: 1px solid #ccc; padding: 10px; margin-bottom: 15px; }
+body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+h1 { text-align: center; }
+div.person { border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; background: #fff; border-radius: 5px; }
 h3 { margin: 0 0 10px 0; }
-select, input { margin: 5px 5px 5px 0; }
+select, input { margin: 5px 5px 5px 0; padding: 5px; }
 ul { margin-top: 10px; padding-left: 20px; }
-button { cursor: pointer; }
+button { cursor: pointer; padding: 5px 10px; margin-left: 5px; }
+button.removeItem { background: red; color: white; border: none; border-radius: 3px; }
+b { display: block; margin-top: 10px; }
