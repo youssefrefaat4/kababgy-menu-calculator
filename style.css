@@ -1,32 +1,24 @@
 body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    background: #f7f7f7;
+  font-family: Arial, sans-serif;
+  margin: 20px;
 }
 
 h1 {
-    color: #b22222;
-}
-
-.order-box {
-    border: 1px solid #ccc;
-    padding: 15px;
-    margin: 15px 0;
-    background: #fff;
-}
-
-.order-box input, .order-box select {
-    margin: 5px;
+  color: #333;
 }
 
 button {
-    background: #b22222;
-    color: #fff;
-    border: none;
-    padding: 8px 12px;
-    cursor: pointer;
+  padding: 8px 12px;
+  margin: 5px 0;
+  cursor: pointer;
 }
 
-button:hover {
-    background: #800000;
+.order-box {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+.item-row {
+  margin: 5px 0;
 }
