@@ -231,8 +231,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const ordersContainer = document.getElementById("ordersContainer");
   const grandTotalSpan = document.getElementById("grandTotal");
   const addOrderBtn = document.getElementById("addOrderBtn");
+  const downloadCSVBtn = document.getElementById("downloadCSVBtn");
 
   addOrderBtn.addEventListener("click", addOrder);
+  downloadCSVBtn.addEventListener("click", downloadCSV);
 
   function addOrder() {
     const orderBox = document.createElement("div");
@@ -299,7 +301,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const item = menu.find(i => i.name === select.value);
       if (item) total += item.price * qty;
     });
-    total *= 1.28; // tax + service
+    total *= 1.28;
     totalSpan.textContent = `Total: ${total.toFixed(2)} EGP`;
     updateGrandTotal();
   }
@@ -312,5 +314,30 @@ document.addEventListener("DOMContentLoaded", () => {
       grandTotal += val;
     });
     grandTotalSpan.textContent = grandTotal.toFixed(2);
+  }
+
+  function downloadCSV() {
+    let csv = "Name,Item,Quantity,Price,Total\n";
+    document.querySelectorAll(".order-box").forEach(orderBox => {
+      const name = orderBox.querySelector("input").value || "No Name";
+      orderBox.querySelectorAll(".item-row").forEach(row => {
+        const itemName = row.querySelector("select").value;
+        const qty = parseInt(row.querySelector("input").value) || 1;
+        const item = menu.find(i => i.name === itemName);
+        if (item) {
+          const total = (item.price * qty * 1.28).toFixed(2);
+          csv += `${name},${itemName},${qty},${item.price},${total}\n`;
+        }
+      });
+    });
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "orders.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 });
