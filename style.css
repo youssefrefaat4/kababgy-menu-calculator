@@ -1,0 +1,57 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background: #fafafa;
+}
+
+h1, h2 {
+    text-align: center;
+    color: #333;
+}
+
+.member {
+    background: white;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+}
+
+.menu-items {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.qty-input {
+    width: 60px;
+    padding: 5px;
+}
+
+#addMemberBtn {
+    width: 100%;
+    padding: 12px;
+    background: #007bff;
+    color: white;
+    border: none;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+#addMemberBtn:hover {
+    background: #0056b3;
+}
+
+.member-total {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #444;
+}
