@@ -1,88 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kababgy Menu Calculator</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background:#fafafa; }
-    h1 { font-size: 24px; margin-bottom: 10px; }
-    select, input { padding: 8px; margin: 5px 0; width: 100%; }
-    table { width:100%; border-collapse: collapse; margin-top:20px; }
-    th, td { border:1px solid #ccc; padding:10px; }
-    button { padding:10px 15px; background:#333; color:#fff; border:none; cursor:pointer; margin-top:10px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Menu Calculator</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>Kababgy Menu Calculator</h1>
-<p>Select an item, choose quantity, and add to order. The calculator will compute totals including tax (1.28x).</p>
+<h1>Team Menu Calculator</h1>
 
-<label>Menu Item</label>
-<select id="itemSelect"></select>
+<div id="team-container"></div>
 
-<label>Quantity</label>
-<input type="number" id="qty" value="1" min="1" />
+<button id="addMemberBtn">Add Team Member</button>
 
-<button onclick="addItem()">Add to Order</button>
+<h2>Total Team Cost: <span id="totalCost">0</span> EGP</h2>
 
-<table>
-  <thead>
-    <tr>
-      <th>Item</th>
-      <th>Qty</th>
-      <th>Unit Price</th>
-      <th>Total</th>
-      <th>Total w/ Tax</th>
-    </tr>
-  </thead>
-  <tbody id="orderTable"></tbody>
-</table>
-
-<h2 id="grandTotal">Grand Total: 0 EGP</h2>
-<h2 id="grandTotalTax">Grand Total w/ Tax: 0 EGP</h2>
-
-<script>
-// Simplified sample — you will paste full menu later
-const menu = {
-  "Milkshake Vanilla": 134.55,
-  "Orange Juice": 82.55,
-  "Grilled Ribs (1/4 Kilo)": 205.55,
-};
-
-const itemSelect = document.getElementById("itemSelect");
-for (let item in menu) {
-  let opt = document.createElement("option");
-  opt.value = item;
-  opt.textContent = `${item} — ${menu[item]} EGP`;
-  itemSelect.appendChild(opt);
-}
-
-function addItem() {
-  const item = itemSelect.value;
-  const qty = parseInt(document.getElementById("qty").value);
-  const price = menu[item];
-  const total = price * qty;
-  const totalTax = total * 1.28;
-
-  const row = document.createElement("tr");
-  row.innerHTML = `<td>${item}</td><td>${qty}</td><td>${price}</td><td>${total.toFixed(2)}</td><td>${totalTax.toFixed(2)}</td>`;
-  document.getElementById("orderTable").appendChild(row);
-
-  updateTotals();
-}
-
-function updateTotals() {
-  let total = 0;
-  let totalTax = 0;
-  document.querySelectorAll("#orderTable tr").forEach(r => {
-    total += parseFloat(r.children[3].textContent);
-    totalTax += parseFloat(r.children[4].textContent);
-  });
-  document.getElementById("grandTotal").textContent = `Grand Total: ${total.toFixed(2)} EGP`;
-  document.getElementById("grandTotalTax").textContent = `Grand Total w/ Tax: ${totalTax.toFixed(2)} EGP`;
-}
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
