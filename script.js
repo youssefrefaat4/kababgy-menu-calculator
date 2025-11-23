@@ -205,66 +205,89 @@ const menu = [
 
 let orders = [];
 
-const itemSelect = document.getElementById('itemSelect');
-const quantityInput = document.getElementById('quantity');
-const personNameInput = document.getElementById('personName');
-const orderSection = document.getElementById('orderSection');
-
-// Populate items dropdown
-menu.forEach(item => {
-  const taxedPrice = (item.price * TAX_SERVICE).toFixed(2);
-  const option = document.createElement('option');
-  option.value = item.name;
-  option.text = `${item.name} - ${item.price.toFixed(2)} EGP (${taxedPrice} incl.)`;
-  itemSelect.appendChild(option);
-});
-
-// Add order
-function addOrder() {
-  const name = personNameInput.value.trim();
-  const itemName = itemSelect.value;
-  const quantity = parseInt(quantityInput.value);
-
+// Add new person section
+function addPerson() {
+  const nameInput = document.getElementById('personName');
+  const name = nameInput.value.trim();
   if (!name) return alert('Enter person name');
-  if (!itemName) return alert('Select an item');
-  if (quantity < 1) return alert('Enter a valid quantity');
 
-  const item = menu.find(i => i.name === itemName);
+  if (orders.some(o => o.personName === name)) return alert('Person already exists');
 
-  let personOrder = orders.find(o => o.personName === name);
-  if (!personOrder) {
-    personOrder = { personName: name, items: [] };
-    orders.push(personOrder);
-  }
-
-  personOrder.items.push({ name: item.name, price: item.price, quantity });
+  orders.push({ personName: name, items: [] });
+  nameInput.value = '';
   renderOrders();
 }
 
-// Render orders
+// Render orders for all persons
 function renderOrders() {
+  const orderSection = document.getElementById('orderSection');
   orderSection.innerHTML = '';
+
   let grandTotal = 0;
 
   orders.forEach(order => {
     const div = document.createElement('div');
     div.className = 'person';
-    div.innerHTML = `<h3>${order.personName}</h3><ul>` +
-      order.items.map((i) => {
+    div.innerHTML = `<h3>${order.personName}</h3>
+      <div class="item-controls">
+        <select class="itemSelect"></select>
+        <input type="number" class="quantityInput" min="1" value="1">
+        <button class="btn" onclick="addItem('${order.personName}', this)">Add Item</button>
+        <button class="btn" onclick="downloadCSV()">Download CSV</button>
+      </div>
+      <ul></ul>
+      <div class="person-total"></div>`;
+
+    orderSection.appendChild(div);
+
+    const select = div.querySelector('.itemSelect');
+    menu.forEach(item => {
+      const taxedPrice = (item.price * TAX_SERVICE).toFixed(2);
+      const option = document.createElement('option');
+      option.value = item.name;
+      option.text = `${item.name} - ${item.price.toFixed(2)} EGP (${taxedPrice} incl.)`;
+      select.appendChild(option);
+    });
+
+    updatePersonTotal(order);
+  });
+
+  updateGrandTotal();
+}
+
+// Add item to person
+function addItem(personName, button) {
+  const personOrder = orders.find(o => o.personName === personName);
+  if (!personOrder) return;
+
+  const div = button.closest('.person');
+  const itemName = div.querySelector('.itemSelect').value;
+  const quantity = parseInt(div.querySelector('.quantityInput').value);
+  if (!itemName) return alert('Select an item');
+  if (quantity < 1) return alert('Enter valid quantity');
+
+  const item = menu.find(i => i.name === itemName);
+  personOrder.items.push({ name: item.name, price: item.price, quantity });
+  renderOrders();
+}
+
+// Update person total
+function updatePersonTotal(order) {
+  const divs = document.querySelectorAll('.person');
+  divs.forEach(div => {
+    if (div.querySelector('h3').innerText === order.personName) {
+      const ul = div.querySelector('ul');
+      ul.innerHTML = order.items.map(i => {
         const taxed = (i.price * i.quantity * TAX_SERVICE).toFixed(2);
         return `<li>${i.name} x ${i.quantity} x 1.28 = ${taxed} EGP
         <button class="removeItem" onclick="removeItem('${order.personName}', '${i.name}')">X</button></li>`;
-      }).join('') +
-      `</ul>`;
-    orderSection.appendChild(div);
+      }).join('');
 
-    grandTotal += order.items.reduce((sum, i) => sum + i.price * i.quantity * TAX_SERVICE, 0);
+      const total = order.items.reduce((sum, i) => sum + i.price * i.quantity * TAX_SERVICE, 0).toFixed(2);
+      div.querySelector('.person-total').innerText = `Total: ${total} EGP`;
+    }
   });
-
-  const grandDiv = document.createElement('div');
-  grandDiv.className = 'grand-total';
-  grandDiv.innerText = `Grand Total: ${grandTotal.toFixed(2)} EGP`;
-  orderSection.appendChild(grandDiv);
+  updateGrandTotal();
 }
 
 // Remove item
@@ -273,6 +296,22 @@ function removeItem(personName, itemName) {
   if (!personOrder) return;
   personOrder.items = personOrder.items.filter(i => i.name !== itemName);
   renderOrders();
+}
+
+// Update grand total
+function updateGrandTotal() {
+  let grandTotal = 0;
+  orders.forEach(o => {
+    grandTotal += o.items.reduce((sum, i) => sum + i.price * i.quantity * TAX_SERVICE, 0);
+  });
+
+  const existing = document.querySelector('.grand-total');
+  if (existing) existing.remove();
+
+  const grandDiv = document.createElement('div');
+  grandDiv.className = 'grand-total';
+  grandDiv.innerText = `Grand Total: ${grandTotal.toFixed(2)} EGP`;
+  document.getElementById('orderSection').appendChild(grandDiv);
 }
 
 // Download CSV
@@ -285,6 +324,9 @@ function downloadCSV() {
       csv += `${order.personName},${i.name},${i.quantity},${i.price.toFixed(2)},${total}\n`;
     });
   });
+  const grandTotal = orders.reduce((sum, o) => sum + o.items.reduce((s, i) => s + i.price * i.quantity * TAX_SERVICE, 0), 0).toFixed(2);
+  csv += `,,,"Grand Total",${grandTotal}\n`;
+
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
