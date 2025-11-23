@@ -1,101 +1,84 @@
 body {
-    font-family: 'Arial', sans-serif;
-    background: #f7f7f7;
-    margin: 0;
-    padding: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  padding: 20px;
+  color: #333;
 }
 
 .container {
-    max-width: 900px;
-    margin: 30px auto;
-    padding: 20px;
-    background: #fff;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    border-radius: 10px;
+  max-width: 900px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
 }
 
 h1 {
-    text-align: center;
-    color: #b22222;
-    margin-bottom: 20px;
+  text-align: center;
+  color: #b22222;
 }
 
-.add-person {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
-input[type="text"], select, input[type="number"] {
-    padding: 8px;
-    font-size: 16px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
+.controls input, .controls select {
+  padding: 8px;
+  font-size: 14px;
 }
 
 .btn {
-    padding: 8px 15px;
-    background-color: #b22222;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.3s;
+  background: #b22222;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 5px;
 }
 
 .btn:hover {
-    background-color: #8b0000;
+  background: #800000;
 }
 
 .person {
-    margin-bottom: 25px;
-    padding: 15px;
-    background: #fff2f2;
-    border-left: 6px solid #b22222;
-    border-radius: 8px;
+  background: #f0f0f0;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
 }
 
 .person h3 {
-    margin-top: 0;
-    color: #b22222;
+  margin: 0 0 5px 0;
 }
 
-.person select, .person input[type="number"] {
-    margin: 5px 0;
+.person ul {
+  list-style: none;
+  padding-left: 0;
 }
 
-ul {
-    list-style: none;
-    padding-left: 0;
-}
-
-ul li {
-    padding: 5px 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.person ul li {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
 }
 
 .removeItem {
-    background: #ff4c4c;
-    border: none;
-    color: white;
-    border-radius: 4px;
-    padding: 2px 6px;
-    cursor: pointer;
-    transition: 0.3s;
+  background: red;
+  color: white;
+  border: none;
+  cursor: pointer;
+  padding: 2px 5px;
+  border-radius: 3px;
 }
 
-.removeItem:hover {
-    background: #b20000;
-}
-
-.download {
-    text-align: center;
-    margin-top: 20px;
-}
-
-.total {
-    font-weight: bold;
-    margin-top: 5px;
+.grand-total {
+  font-size: 20px;
+  font-weight: bold;
+  color: #b22222;
+  margin-top: 20px;
+  text-align: right;
 }
