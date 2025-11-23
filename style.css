@@ -1,9 +1,101 @@
-body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
-h1 { text-align: center; }
-div.person { border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; background: #fff; border-radius: 5px; }
-h3 { margin: 0 0 10px 0; }
-select, input { margin: 5px 5px 5px 0; padding: 5px; }
-ul { margin-top: 10px; padding-left: 20px; }
-button { cursor: pointer; padding: 5px 10px; margin-left: 5px; }
-button.removeItem { background: red; color: white; border: none; border-radius: 3px; }
-b { display: block; margin-top: 10px; }
+body {
+    font-family: 'Arial', sans-serif;
+    background: #f7f7f7;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+    background: #fff;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+
+h1 {
+    text-align: center;
+    color: #b22222;
+    margin-bottom: 20px;
+}
+
+.add-person {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input[type="text"], select, input[type="number"] {
+    padding: 8px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.btn {
+    padding: 8px 15px;
+    background-color: #b22222;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn:hover {
+    background-color: #8b0000;
+}
+
+.person {
+    margin-bottom: 25px;
+    padding: 15px;
+    background: #fff2f2;
+    border-left: 6px solid #b22222;
+    border-radius: 8px;
+}
+
+.person h3 {
+    margin-top: 0;
+    color: #b22222;
+}
+
+.person select, .person input[type="number"] {
+    margin: 5px 0;
+}
+
+ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+ul li {
+    padding: 5px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.removeItem {
+    background: #ff4c4c;
+    border: none;
+    color: white;
+    border-radius: 4px;
+    padding: 2px 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.removeItem:hover {
+    background: #b20000;
+}
+
+.download {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.total {
+    font-weight: bold;
+    margin-top: 5px;
+}
