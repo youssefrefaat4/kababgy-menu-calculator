@@ -201,16 +201,17 @@ const menu = [
   { category: "Kitchen Corner (Seafood)", name: "Sea Bass Fillet", price: 600.55 }
 ];
 
-
 let orders = []; // { personName, items: [{name, quantity, price}] }
 
 // Add new person
 function addPerson() {
-  const name = document.getElementById('personName').value.trim();
+  const nameInput = document.getElementById('personName');
+  const name = nameInput.value.trim();
   if (!name) return alert('Enter a name');
+
   orders.push({ personName: name, items: [] });
+  nameInput.value = '';
   renderOrders();
-  document.getElementById('personName').value = '';
 }
 
 // Render all persons and their orders
@@ -221,21 +222,32 @@ function renderOrders() {
   orders.forEach((order, index) => {
     const div = document.createElement('div');
     div.className = 'person';
+
+    // Category options
+    const categories = [...new Set(menu.map(i => i.category))];
+
     div.innerHTML = `
       <h3>${order.personName}</h3>
       <select onchange="updateItemsDropdown(${index}, this.value)">
         <option value="">Select Category</option>
-        ${[...new Set(menu.map(i => i.category))].map(cat => `<option value="${cat}">${cat}</option>`).join('')}
+        ${categories.map(cat => `<option value="${cat}">${cat}</option>`).join('')}
       </select>
+
       <select id="itemSelect-${index}">
         <option value="">Select Item</option>
       </select>
+
       <input type="number" min="1" value="1" id="quantity-${index}">
       <button onclick="addItemToPerson(${index})">Add Item</button>
+
       <ul id="personItems-${index}">
-        ${order.items.map(item => `<li>${item.name} x ${item.quantity} = ${(item.price * item.quantity).toFixed(2)} EGP</li>`).join('')}
+        ${order.items.map((item, i) => 
+          `<li>${item.name} x ${item.quantity} = ${(item.price*item.quantity).toFixed(2)} EGP
+            <button class="removeItem" onclick="removeItem(${index}, ${i})">X</button>
+          </li>`).join('')}
       </ul>
-      <b>Total: ${order.items.reduce((sum, i) => sum + i.price * i.quantity, 0).toFixed(2)} EGP</b>
+
+      <b>Total: ${order.items.reduce((sum, i) => sum + i.price*i.quantity, 0).toFixed(2)} EGP</b>
     `;
     section.appendChild(div);
   });
@@ -252,11 +264,24 @@ function updateItemsDropdown(personIndex, category) {
 // Add item to person
 function addItemToPerson(personIndex) {
   const itemSelect = document.getElementById(`itemSelect-${personIndex}`);
-  const quantity = parseInt(document.getElementById(`quantity-${personIndex}`).value);
+  const quantityInput = document.getElementById(`quantity-${personIndex}`);
+  const quantity = parseInt(quantityInput.value);
   const itemName = itemSelect.value;
-  if (!itemName || quantity < 1) return alert('Select item and quantity');
+
+  if (!itemName || quantity < 1) return alert('Select item and enter quantity');
 
   const itemData = menu.find(i => i.name === itemName);
   orders[personIndex].items.push({ name: itemData.name, quantity, price: itemData.price });
+
+  // Reset item & quantity
+  itemSelect.value = '';
+  quantityInput.value = 1;
+
+  renderOrders();
+}
+
+// Remove item from person
+function removeItem(personIndex, itemIndex) {
+  orders[personIndex].items.splice(itemIndex, 1);
   renderOrders();
 }
