@@ -1,28 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kasr El-Kababgy Menu Calculator</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kasr El-Kababgy Menu Calculator</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="container">
+    <h1>Kasr El-Kababgy Menu Calculator</h1>
 
-<div class="container">
-  <h1>Kasr El-Kababgy Menu Calculator</h1>
+    <div class="controls">
+      <input type="text" id="personName" placeholder="Enter Person Name">
+      <select id="categorySelect">
+        <option value="">Select Category</option>
+      </select>
+      <select id="itemSelect">
+        <option value="">Select Item</option>
+      </select>
+      <input type="number" id="quantity" min="1" value="1">
+      <button class="btn" onclick="addOrder()">Add Order</button>
+      <button class="btn" onclick="downloadCSV()">Download CSV</button>
+    </div>
 
-  <div class="add-person">
-    <input type="text" id="personName" placeholder="Enter Person Name">
-    <button class="btn" onclick="addPerson()">Add Person</button>
+    <div id="orderSection"></div>
   </div>
 
-  <div id="orderSection" class="order-section"></div>
-
-  <div class="download">
-    <button class="btn download-btn" onclick="downloadCSV()">Download CSV</button>
-  </div>
-</div>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
