@@ -1,3 +1,5 @@
+const TAX_SERVICE = 1.28;
+
 // --- Full menu hardcoded ---
 const menu = [
   { category: "Milkshakes", name: "Milkshake Vanilla", price: 134.55 },
@@ -201,9 +203,9 @@ const menu = [
   { category: "Kitchen Corner (Seafood)", name: "Sea Bass Fillet", price: 600.55 }
 ];
 
-let orders = []; // { personName, items: [{name, quantity, price}] }
+let orders = [];
 
-// Add new person
+// Add Person
 function addPerson() {
   const nameInput = document.getElementById('personName');
   const name = nameInput.value.trim();
@@ -214,16 +216,17 @@ function addPerson() {
   renderOrders();
 }
 
-// Render all persons and their orders
+// Render orders
 function renderOrders() {
   const section = document.getElementById('orderSection');
   section.innerHTML = '';
+
+  let grandTotal = 0;
 
   orders.forEach((order, index) => {
     const div = document.createElement('div');
     div.className = 'person';
 
-    // Category options
     const categories = [...new Set(menu.map(i => i.category))];
 
     div.innerHTML = `
@@ -238,27 +241,45 @@ function renderOrders() {
       </select>
 
       <input type="number" min="1" value="1" id="quantity-${index}">
-      <button onclick="addItemToPerson(${index})">Add Item</button>
+      <button class="btn" onclick="addItemToPerson(${index})">Add Item</button>
 
       <ul id="personItems-${index}">
-        ${order.items.map((item, i) => 
-          `<li>${item.name} x ${item.quantity} = ${(item.price*item.quantity).toFixed(2)} EGP
+        ${order.items.map((item, i) => {
+          const totalPrice = (item.price*item.quantity*TAX_SERVICE).toFixed(2);
+          return `<li>${item.name} x ${item.quantity} = ${totalPrice} EGP
             <button class="removeItem" onclick="removeItem(${index}, ${i})">X</button>
-          </li>`).join('')}
+          </li>`
+        }).join('')}
       </ul>
 
-      <b>Total: ${order.items.reduce((sum, i) => sum + i.price*i.quantity, 0).toFixed(2)} EGP</b>
+      <div class="total">Total: ${(order.items.reduce((sum,i)=>sum+i.price*i.quantity*TAX_SERVICE,0)).toFixed(2)} EGP</div>
     `;
     section.appendChild(div);
+
+    // Add to grand total
+    grandTotal += order.items.reduce((sum,i)=>sum+i.price*i.quantity*TAX_SERVICE,0);
   });
+
+  // Add grand total div
+  const grandDiv = document.createElement('div');
+  grandDiv.className = 'grand-total';
+  grandDiv.style.marginTop = '20px';
+  grandDiv.style.fontSize = '20px';
+  grandDiv.style.fontWeight = 'bold';
+  grandDiv.style.color = '#b22222';
+  grandDiv.innerText = `Grand Total (All Orders): ${grandTotal.toFixed(2)} EGP`;
+  section.appendChild(grandDiv);
 }
 
-// Update items dropdown based on category
+// Update items dropdown
 function updateItemsDropdown(personIndex, category) {
   const itemSelect = document.getElementById(`itemSelect-${personIndex}`);
   itemSelect.innerHTML = `<option value="">Select Item</option>` +
     menu.filter(i => i.category === category)
-        .map(i => `<option value="${i.name}">${i.name}</option>`).join('');
+        .map(i => {
+          const taxed = (i.price*TAX_SERVICE).toFixed(2);
+          return `<option value="${i.name}">${i.name} - ${i.price.toFixed(2)} EGP (${taxed} incl.)</option>`;
+        }).join('');
 }
 
 // Add item to person
@@ -273,15 +294,34 @@ function addItemToPerson(personIndex) {
   const itemData = menu.find(i => i.name === itemName);
   orders[personIndex].items.push({ name: itemData.name, quantity, price: itemData.price });
 
-  // Reset item & quantity
   itemSelect.value = '';
   quantityInput.value = 1;
-
   renderOrders();
 }
 
-// Remove item from person
+// Remove item
 function removeItem(personIndex, itemIndex) {
   orders[personIndex].items.splice(itemIndex, 1);
   renderOrders();
+}
+
+// Download CSV
+function downloadCSV() {
+  if (orders.length === 0) return alert('No orders to export.');
+
+  let csvContent = "Person,Item,Quantity,Price (EGP),Total incl. Tax & Service (EGP)\n";
+  orders.forEach(order => {
+    order.items.forEach(item => {
+      const total = (item.price*item.quantity*TAX_SERVICE).toFixed(2);
+      csvContent += `${order.personName},${item.name},${item.quantity},${item.price.toFixed(2)},${total}\n`;
+    });
+  });
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "KasrElKababgy_Orders.csv";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
