@@ -205,7 +205,7 @@ const menu = [
 
 let orders = [];
 
-// Add Person / Order
+// Add Person
 document.getElementById('addPersonBtn').addEventListener('click', () => {
   const nameInput = document.getElementById('personName');
   const name = nameInput.value.trim();
@@ -221,12 +221,14 @@ document.getElementById('addPersonBtn').addEventListener('click', () => {
 function renderOrders() {
   const orderSection = document.getElementById('orderSection');
   orderSection.innerHTML = '';
-  
+
   let grandTotal = 0;
 
   orders.forEach(order => {
     const div = document.createElement('div');
     div.className = 'person';
+    div.setAttribute('data-person', order.personName);
+
     div.innerHTML = `
       <h3>${order.personName}</h3>
       <div class="item-controls">
@@ -238,6 +240,7 @@ function renderOrders() {
       <ul></ul>
       <div class="person-total"></div>
     `;
+
     orderSection.appendChild(div);
 
     // Populate categories
@@ -262,10 +265,11 @@ function renderOrders() {
         itemSelect.appendChild(option);
       });
     }
+
     populateItems();
     catSelect.addEventListener('change', populateItems);
 
-    // Add Item event
+    // Add Item button for this person
     div.querySelector('.addItemBtn').addEventListener('click', () => {
       const itemName = itemSelect.value;
       const quantity = parseInt(div.querySelector('.quantityInput').value);
@@ -283,20 +287,16 @@ function renderOrders() {
 
 // Update person total
 function updatePersonTotal(order) {
-  const divs = document.querySelectorAll('.person');
-  divs.forEach(div => {
-    if (div.querySelector('h3').innerText === order.personName) {
-      const ul = div.querySelector('ul');
-      ul.innerHTML = order.items.map(i => {
-        const taxed = (i.price * i.quantity * TAX_SERVICE).toFixed(2);
-        return `<li>${i.name} x ${i.quantity} x 1.28 = ${taxed} EGP 
-        <button class="removeItem" onclick="removeItem('${order.personName}', '${i.name}')">X</button></li>`;
-      }).join('');
+  const div = document.querySelector(`.person[data-person='${order.personName}']`);
+  const ul = div.querySelector('ul');
+  ul.innerHTML = order.items.map(i => {
+    const taxed = (i.price * i.quantity * TAX_SERVICE).toFixed(2);
+    return `<li>${i.name} x ${i.quantity} x 1.28 = ${taxed} EGP
+      <button class="removeItem" onclick="removeItem('${order.personName}', '${i.name}')">X</button></li>`;
+  }).join('');
 
-      const total = order.items.reduce((sum, i) => sum + i.price * i.quantity * TAX_SERVICE, 0).toFixed(2);
-      div.querySelector('.person-total').innerText = `Total: ${total} EGP`;
-    }
-  });
+  const total = order.items.reduce((sum, i) => sum + i.price * i.quantity * TAX_SERVICE, 0).toFixed(2);
+  div.querySelector('.person-total').innerText = `Total: ${total} EGP`;
 }
 
 // Remove item
