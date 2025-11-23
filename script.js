@@ -227,12 +227,13 @@ const menu = [
   { name: "Sea Bass Fillet", price: 600.55 }
 ];
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function () {
   const ordersContainer = document.getElementById("ordersContainer");
   const grandTotalSpan = document.getElementById("grandTotal");
   const addOrderBtn = document.getElementById("addOrderBtn");
   const downloadCSVBtn = document.getElementById("downloadCSVBtn");
 
+  // Event listeners
   addOrderBtn.addEventListener("click", addOrder);
   downloadCSVBtn.addEventListener("click", downloadCSV);
 
@@ -240,29 +241,33 @@ document.addEventListener("DOMContentLoaded", () => {
     const orderBox = document.createElement("div");
     orderBox.className = "order-box";
 
+    // Name input
     const nameInput = document.createElement("input");
     nameInput.placeholder = "Name";
     orderBox.appendChild(nameInput);
     orderBox.appendChild(document.createElement("br"));
 
+    // Add first item row
     addItemRow(orderBox, 1);
 
+    // Add item button
     const addItemBtn = document.createElement("button");
     addItemBtn.textContent = "Add Item";
     addItemBtn.addEventListener("click", () => {
       const nextIndex = orderBox.querySelectorAll(".item-row").length + 1;
       addItemRow(orderBox, nextIndex);
     });
-
     orderBox.appendChild(addItemBtn);
     orderBox.appendChild(document.createElement("br"));
 
+    // Total span
     const totalSpan = document.createElement("span");
     totalSpan.textContent = "Total: 0.00 EGP";
     orderBox.appendChild(totalSpan);
 
     ordersContainer.appendChild(orderBox);
 
+    // Update total when input changes
     orderBox.addEventListener("input", () => updateOrderTotal(orderBox, totalSpan));
   }
 
