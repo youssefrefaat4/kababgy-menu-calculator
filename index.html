@@ -7,16 +7,46 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Kasr El-Kababgy Calculator</h1>
+  <div class="container">
+    <aside class="sidebar">
+      <h2>Menu</h2>
+      <div id="menu-items" class="menu-items"></div>
+    </aside>
 
-  <button id="addOrderBtn">Add Order</button>
-  <button id="downloadCSVBtn">Download CSV</button>
+    <main class="main">
+      <h1>Kasr El-Kababgy Calculator</h1>
 
-  <div id="ordersContainer"></div>
+      <div class="order-section">
+        <label for="menu-select">Select Item:</label>
+        <select id="menu-select"></select>
+        <input type="number" id="quantity" min="1" value="1">
+        <button id="add-order">Add Order</button>
+      </div>
 
-  <h3>Grand Total: <span id="grandTotal">0.00</span> EGP</h3>
+      <table id="order-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Price (EGP)</th>
+            <th>Quantity</th>
+            <th>Total (EGP)</th>
+            <th>Remove</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+          <tr>
+            <th colspan="3">Grand Total</th>
+            <th id="grand-total">0.00</th>
+            <th></th>
+          </tr>
+        </tfoot>
+      </table>
 
-  <!-- Make sure script is loaded at the end -->
+      <button id="download-csv">Download CSV</button>
+    </main>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
