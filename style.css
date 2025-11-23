@@ -1,24 +1,76 @@
 body {
   font-family: Arial, sans-serif;
-  margin: 20px;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  height: 100vh;
 }
 
-h1 {
-  color: #333;
+.container {
+  display: flex;
+  width: 100%;
 }
 
-button {
-  padding: 8px 12px;
-  margin: 5px;
+.sidebar {
+  width: 250px;
+  background-color: #f7f7f7;
+  padding: 20px;
+  overflow-y: auto;
+  border-right: 1px solid #ccc;
+}
+
+.sidebar h2 {
+  text-align: center;
+}
+
+.menu-items {
+  margin-top: 10px;
+}
+
+.menu-items div {
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
   cursor: pointer;
 }
 
-.order-box {
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin: 10px 0;
+.menu-items div:hover {
+  background-color: #eee;
 }
 
-.item-row {
-  margin: 5px 0;
+.main {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.order-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+#quantity {
+  width: 60px;
+}
+
+#order-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+#order-table th, #order-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+#order-table th {
+  background-color: #f0f0f0;
+}
+
+button {
+  cursor: pointer;
+  padding: 5px 10px;
 }
