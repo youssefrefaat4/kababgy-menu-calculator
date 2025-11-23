@@ -1,145 +1,141 @@
-// Elements
-const namesContainer = document.getElementById("names-container");
-const addNameBtn = document.getElementById("addNameBtn");
-const downloadCSVBtn = document.getElementById("downloadCSVBtn");
-const totalCostLabel = document.getElementById("totalCost");
-
-let nameCount = 0;
 let menu = [];
-let orders = []; // store all orders in memory
+let orders = [];
 
-// Load menu from CSV
-fetch("menu.csv")
+// Load menu.csv
+fetch('menu.csv')
+  .then(res => res.text())
+  .then(data => {
+    const lines = data.trim().split('\n');
+    for (let i = 1; i < lines.length; i++) {
+      const [name, price] = lines[i].split(',');
+      menu.push({ name, price: parseFloat(price) });
+    }
+    // After menu is loaded, load orders
+    loadOrders();
+  })
+  .catch(err => console.error('Error loading menu:', err));
+
+// Load orders.csv
+function loadOrders() {
+  fetch('orders.csv')
     .then(res => res.text())
     .then(data => {
-        menu = parseCSV(data);
-        loadOrders(); // Load initial orders after menu is ready
-    });
-
-// Load orders from CSV
-function loadOrders() {
-    fetch("orders.csv")
-        .then(res => res.text())
-        .then(data => {
-            orders = parseCSV(data);
-            // Populate names
-            const grouped = {};
-            orders.forEach(row => {
-                if(!grouped[row['Name']]) grouped[row['Name']] = [];
-                grouped[row['Name']].push(row);
-            });
-            Object.keys(grouped).forEach(name => addName(name, grouped[name]));
+      const lines = data.trim().split('\n');
+      for (let i = 1; i < lines.length; i++) {
+        const [Name, Item, Quantity, Price] = lines[i].split(',');
+        orders.push({
+          name: Name,
+          item: Item,
+          quantity: parseInt(Quantity),
+          price: parseFloat(Price)
         });
+      }
+      renderOrders();
+    })
+    .catch(err => console.log('No orders.csv found or empty, starting fresh.'));
 }
 
-// Add new Name
-addNameBtn.addEventListener("click", () => addName());
+function renderOrders() {
+  const tbody = document.querySelector('#orders-table tbody');
+  tbody.innerHTML = '';
+  orders.forEach((order, index) => {
+    const row = document.createElement('tr');
 
-// Add Name function
-function addName(name = "", items = []) {
-    nameCount++;
-    const nameDiv = document.createElement("div");
-    nameDiv.className = "name";
+    // Name
+    const nameCell = document.createElement('td');
+    nameCell.textContent = order.name;
+    row.appendChild(nameCell);
 
-    nameDiv.innerHTML = `
-        <div class="name-header">
-            <input type="text" placeholder="Name" class="name-input" value="${name}">
-            <button class="addItemBtn">Add Item</button>
-        </div>
-        <div class="items-container"></div>
-        <p class="name-total">Total: <span>0</span> EGP</p>
-    `;
-    namesContainer.appendChild(nameDiv);
-
-    const itemsContainer = nameDiv.querySelector(".items-container");
-    const addItemBtn = nameDiv.querySelector(".addItemBtn");
-
-    // Add items if any exist
-    if(items.length > 0){
-        items.forEach(it => addItemRow(itemsContainer, it['Item'], it['Quantity']));
-    } else {
-        addItemRow(itemsContainer); // default one row
-    }
-
-    addItemBtn.addEventListener("click", () => addItemRow(itemsContainer));
-
-    // Update total on any change
-    itemsContainer.addEventListener("input", calculateCosts);
-    nameDiv.querySelector(".name-input").addEventListener("input", calculateCosts);
-}
-
-// Add item row
-function addItemRow(container, selectedItem = "", quantity = 1) {
-    const row = document.createElement("div");
-    row.className = "item-row";
-
-    row.innerHTML = `
-        <select class="item-select">
-            ${menu.map(item => `<option value="${item.Price}" ${item.name===selectedItem?'selected':''}>${item.name} (${item.Price} EGP)</option>`).join('')}
-        </select>
-        <input type="number" class="item-qty" min="1" value="${quantity}">
-        <button class="removeItemBtn">X</button>
-    `;
-    container.appendChild(row);
-
-    row.querySelector(".removeItemBtn").addEventListener("click", () => {
-        row.remove();
-        calculateCosts();
+    // Item Dropdown
+    const itemCell = document.createElement('td');
+    const select = document.createElement('select');
+    menu.forEach(m => {
+      const option = document.createElement('option');
+      option.value = m.name;
+      option.textContent = `${m.name} (${m.price} EGP)`;
+      if (m.name === order.item) option.selected = true;
+      select.appendChild(option);
     });
+    select.onchange = () => {
+      const selectedItem = menu.find(m => m.name === select.value);
+      order.item = selectedItem.name;
+      order.price = selectedItem.price;
+      updateRow(row, order);
+    };
+    itemCell.appendChild(select);
+    row.appendChild(itemCell);
+
+    // Quantity
+    const quantityCell = document.createElement('td');
+    const qtyInput = document.createElement('input');
+    qtyInput.type = 'number';
+    qtyInput.min = 1;
+    qtyInput.value = order.quantity;
+    qtyInput.oninput = () => {
+      order.quantity = parseInt(qtyInput.value);
+      updateRow(row, order);
+    };
+    quantityCell.appendChild(qtyInput);
+    row.appendChild(quantityCell);
+
+    // Price per Item
+    const priceCell = document.createElement('td');
+    priceCell.textContent = order.price.toFixed(2);
+    row.appendChild(priceCell);
+
+    // Total with Tax
+    const totalCell = document.createElement('td');
+    totalCell.textContent = (order.price * order.quantity * 1.28).toFixed(2);
+    row.appendChild(totalCell);
+
+    // Action
+    const actionCell = document.createElement('td');
+    const delBtn = document.createElement('button');
+    delBtn.textContent = 'Delete';
+    delBtn.onclick = () => {
+      orders.splice(index, 1);
+      renderOrders();
+    };
+    actionCell.appendChild(delBtn);
+    row.appendChild(actionCell);
+
+    tbody.appendChild(row);
+  });
 }
 
-// Calculate totals
-function calculateCosts() {
-    let teamTotal = 0;
-
-    document.querySelectorAll(".name").forEach(nameDiv => {
-        let nameTotal = 0;
-        const nameInput = nameDiv.querySelector(".name-input");
-        const items = nameDiv.querySelectorAll(".item-row");
-        items.forEach(item => {
-            const price = parseFloat(item.querySelector(".item-select").value);
-            const qty = parseInt(item.querySelector(".item-qty").value);
-            nameTotal += price * qty;
-        });
-        nameTotal *= 1.28; // tax/service per name
-        nameDiv.querySelector(".name-total span").innerText = nameTotal.toFixed(2);
-        teamTotal += nameTotal;
-    });
-
-    totalCostLabel.innerText = teamTotal.toFixed(2);
+function updateRow(row, order) {
+  row.cells[3].textContent = order.price.toFixed(2);
+  row.cells[4].textContent = (order.price * order.quantity * 1.28).toFixed(2);
 }
 
-// CSV parsing utility
-function parseCSV(data) {
-    const lines = data.split("\n").filter(l => l.trim() !== "");
-    const headers = lines[0].split(",");
-    return lines.slice(1).map(line => {
-        const values = line.split(",");
-        const obj = {};
-        headers.forEach((h,i) => obj[h.trim()] = values[i].trim());
-        return obj;
-    });
+function addMember() {
+  const nameInput = document.getElementById('member-name');
+  const name = nameInput.value.trim();
+  if (!name) return alert('Enter a name!');
+  
+  // Add one empty order row for this member
+  orders.push({
+    name: name,
+    item: menu[0].name,
+    quantity: 1,
+    price: menu[0].price
+  });
+
+  nameInput.value = '';
+  renderOrders();
 }
 
 // Download CSV
-downloadCSVBtn.addEventListener("click", () => {
-    let csv = "Name,Item,Quantity,Price(EGP)\n";
-    document.querySelectorAll(".name").forEach(nameDiv => {
-        const name = nameDiv.querySelector(".name-input").value || "Unnamed";
-        const items = nameDiv.querySelectorAll(".item-row");
-        items.forEach(item => {
-            const itemName = item.querySelector(".item-select").selectedOptions[0].text.split(' (')[0];
-            const qty = item.querySelector(".item-qty").value;
-            const price = parseFloat(item.querySelector(".item-select").value) * 1.28;
-            csv += `${name},${itemName},${qty},${(price*qty).toFixed(2)}\n`;
-        });
-    });
+function downloadCSV() {
+  let csv = 'Name,Item,Quantity,Price(EGP)\n';
+  orders.forEach(o => {
+    csv += `${o.name},${o.item},${o.quantity},${o.price}\n`;
+  });
 
-    const blob = new Blob([csv], {type: "text/csv"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "orders.csv";
-    a.click();
-    URL.revokeObjectURL(url);
-});
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'orders.csv';
+  a.click();
+}
