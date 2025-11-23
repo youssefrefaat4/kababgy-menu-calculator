@@ -8,19 +8,19 @@
 </head>
 <body>
 
-<h1>Kasr El-Kababgy Menu Calculator</h1>
+<div class="container">
+  <h1>Kasr El-Kababgy Menu Calculator</h1>
 
-<div>
-  <input type="text" id="personName" placeholder="Enter Person Name">
-  <button onclick="addPerson()">Add Person</button>
-</div>
+  <div class="add-person">
+    <input type="text" id="personName" placeholder="Enter Person Name">
+    <button class="btn" onclick="addPerson()">Add Person</button>
+  </div>
 
-<div id="orderSection" style="margin-top: 20px;">
-  <!-- Per-person orders will appear here -->
-</div>
+  <div id="orderSection" class="order-section"></div>
 
-<div style="margin-top: 20px;">
-  <button onclick="downloadCSV()">Download CSV</button>
+  <div class="download">
+    <button class="btn download-btn" onclick="downloadCSV()">Download CSV</button>
+  </div>
 </div>
 
 <script src="script.js"></script>
