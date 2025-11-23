@@ -1,37 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Team Menu Calculator</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kasr El-Kababgy calculator</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Team Menu Calculator</h1>
-
-  <div id="add-member-section">
-    <input type="text" id="member-name" placeholder="Enter Name">
-    <button onclick="addMember()">Add Name</button>
-  </div>
-
-  <div id="orders-section">
-    <table id="orders-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Item</th>
-          <th>Quantity</th>
-          <th>Price per Item (EGP)</th>
-          <th>Total with Tax (EGP)</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
-  <button onclick="downloadCSV()">Download CSV</button>
-
-  <script src="script.js"></script>
+<h1>Kasr El-Kababgy Calculator</h1>
+<button id="addOrderBtn">Add Order</button>
+<div id="ordersContainer"></div>
+<script src="script.js"></script>
 </body>
 </html>
