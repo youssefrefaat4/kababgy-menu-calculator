@@ -1,7 +1,7 @@
 body {
     font-family: Arial, sans-serif;
     padding: 20px;
-    background: #fafafa;
+    background: #f7f7f7;
 }
 
 h1, h2 {
@@ -9,7 +9,7 @@ h1, h2 {
     color: #333;
 }
 
-.member {
+.name {
     background: white;
     padding: 15px;
     margin: 15px 0;
@@ -17,40 +17,78 @@ h1, h2 {
     box-shadow: 0 0 8px rgba(0,0,0,0.1);
 }
 
-.menu-items {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-}
-
-.item-row {
+.name-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.qty-input {
-    width: 60px;
+.name-header input {
     padding: 5px;
-}
-
-#addMemberBtn {
-    width: 100%;
-    padding: 12px;
-    background: #007bff;
-    color: white;
-    border: none;
-    margin-top: 10px;
-    cursor: pointer;
-    border-radius: 6px;
     font-size: 16px;
 }
 
-#addMemberBtn:hover {
+.item-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 8px;
+}
+
+.item-row select, .item-row input {
+    padding: 5px;
+    font-size: 14px;
+}
+
+.item-row button {
+    padding: 5px 8px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.item-row button:hover {
+    background: #a71d2a;
+}
+
+.addItemBtn {
+    margin-top: 5px;
+    padding: 5px 8px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+#addNameBtn, #downloadCSVBtn {
+    width: 48%;
+    padding: 12px;
+    margin-top: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 6px;
+    border: none;
+}
+
+#addNameBtn {
+    background: #007bff;
+    color: white;
+}
+
+#addNameBtn:hover {
     background: #0056b3;
 }
 
-.member-total {
+#downloadCSVBtn {
+    background: #28a745;
+    color: white;
+}
+
+#downloadCSVBtn:hover {
+    background: #1c7c31;
+}
+
+.name-total {
     margin-top: 10px;
     font-weight: bold;
     color: #444;
