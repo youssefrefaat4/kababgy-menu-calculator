@@ -202,116 +202,61 @@ const menu = [
 ];
 
 
-// --- Populate sidebar ---
-const menuItemsDiv = document.getElementById("menu-items");
-const menuSelect = document.getElementById("menu-select");
+let orders = []; // { personName, items: [{name, quantity, price}] }
 
-menu.forEach(item => {
-  // Sidebar
-  const div = document.createElement("div");
-  div.textContent = `${item.name} - ${item.price} EGP`;
-  menuItemsDiv.appendChild(div);
+// Add new person
+function addPerson() {
+  const name = document.getElementById('personName').value.trim();
+  if (!name) return alert('Enter a name');
+  orders.push({ personName: name, items: [] });
+  renderOrders();
+  document.getElementById('personName').value = '';
+}
 
-  // Dropdown
-  const option = document.createElement("option");
-  option.value = item.name;
-  option.textContent = `${item.name} (${item.price} EGP)`;
-  menuSelect.appendChild(option);
-});
-
-// --- Orders ---
-let orders = JSON.parse(localStorage.getItem("orders")) || [];
-
-const orderTableBody = document.querySelector("#order-table tbody");
-const grandTotalEl = document.getElementById("grand-total");
-
+// Render all persons and their orders
 function renderOrders() {
-  orderTableBody.innerHTML = "";
-  let grandTotal = 0;
+  const section = document.getElementById('orderSection');
+  section.innerHTML = '';
 
   orders.forEach((order, index) => {
-    const row = document.createElement("tr");
-
-    const itemCell = document.createElement("td");
-    itemCell.textContent = order.name;
-
-    const priceCell = document.createElement("td");
-    priceCell.textContent = order.price.toFixed(2);
-
-    const qtyCell = document.createElement("td");
-    qtyCell.textContent = order.quantity;
-
-    const totalCell = document.createElement("td");
-    const total = order.price * order.quantity;
-    totalCell.textContent = total.toFixed(2);
-    grandTotal += total;
-
-    const removeCell = document.createElement("td");
-    const removeBtn = document.createElement("button");
-    removeBtn.textContent = "Remove";
-    removeBtn.onclick = () => {
-      orders.splice(index, 1);
-      saveAndRender();
-    };
-    removeCell.appendChild(removeBtn);
-
-    row.appendChild(itemCell);
-    row.appendChild(priceCell);
-    row.appendChild(qtyCell);
-    row.appendChild(totalCell);
-    row.appendChild(removeCell);
-
-    orderTableBody.appendChild(row);
+    const div = document.createElement('div');
+    div.className = 'person';
+    div.innerHTML = `
+      <h3>${order.personName}</h3>
+      <select onchange="updateItemsDropdown(${index}, this.value)">
+        <option value="">Select Category</option>
+        ${[...new Set(menu.map(i => i.category))].map(cat => `<option value="${cat}">${cat}</option>`).join('')}
+      </select>
+      <select id="itemSelect-${index}">
+        <option value="">Select Item</option>
+      </select>
+      <input type="number" min="1" value="1" id="quantity-${index}">
+      <button onclick="addItemToPerson(${index})">Add Item</button>
+      <ul id="personItems-${index}">
+        ${order.items.map(item => `<li>${item.name} x ${item.quantity} = ${(item.price * item.quantity).toFixed(2)} EGP</li>`).join('')}
+      </ul>
+      <b>Total: ${order.items.reduce((sum, i) => sum + i.price * i.quantity, 0).toFixed(2)} EGP</b>
+    `;
+    section.appendChild(div);
   });
-
-  grandTotalEl.textContent = grandTotal.toFixed(2);
 }
 
-function saveAndRender() {
-  localStorage.setItem("orders", JSON.stringify(orders));
+// Update items dropdown based on category
+function updateItemsDropdown(personIndex, category) {
+  const itemSelect = document.getElementById(`itemSelect-${personIndex}`);
+  itemSelect.innerHTML = `<option value="">Select Item</option>` +
+    menu.filter(i => i.category === category)
+        .map(i => `<option value="${i.name}">${i.name}</option>`).join('');
+}
+
+// Add item to person
+function addItemToPerson(personIndex) {
+  const itemSelect = document.getElementById(`itemSelect-${personIndex}`);
+  const quantity = parseInt(document.getElementById(`quantity-${personIndex}`).value);
+  const itemName = itemSelect.value;
+  if (!itemName || quantity < 1) return alert('Select item and quantity');
+
+  const itemData = menu.find(i => i.name === itemName);
+  orders[personIndex].items.push({ name: itemData.name, quantity, price: itemData.price });
   renderOrders();
 }
-
-// --- Add Order ---
-document.getElementById("add-order").addEventListener("click", () => {
-  const selectedName = menuSelect.value;
-  const quantity = parseInt(document.getElementById("quantity").value);
-
-  if (!selectedName || quantity < 1) return;
-
-  const menuItem = menu.find(item => item.name === selectedName);
-
-  const existingOrder = orders.find(o => o.name === selectedName);
-  if (existingOrder) {
-    existingOrder.quantity += quantity;
-  } else {
-    orders.push({
-      name: menuItem.name,
-      price: menuItem.price,
-      quantity
-    });
-  }
-
-  saveAndRender();
-});
-
-// --- Download CSV ---
-document.getElementById("download-csv").addEventListener("click", () => {
-  let csv = "Item,Price,Quantity,Total\n";
-  orders.forEach(o => {
-    const total = (o.price * o.quantity).toFixed(2);
-    csv += `${o.name},${o.price.toFixed(2)},${o.quantity},${total}\n`;
-  });
-
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "orders.csv";
-  a.click();
-  URL.revokeObjectURL(url);
-});
-
-// --- Initial render ---
-renderOrders();
